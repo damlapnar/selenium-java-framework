@@ -1,10 +1,8 @@
 package com.automation.pages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
@@ -23,9 +21,8 @@ public class InventoryPage extends BasePage {
     @FindBy(css = ".shopping_cart_link")
     private WebElement cartLink;
 
-    public InventoryPage(WebDriver driver) {
-        super(driver);
-        PageFactory.initElements(driver, this);
+    public InventoryPage() {
+        super();
     }
 
     public int getProductCount() {
@@ -33,9 +30,9 @@ public class InventoryPage extends BasePage {
     }
 
     public void addItemToCart(String itemName) {
-        WebElement item = driver.findElement(
+        WebElement btn = driver.findElement(
             By.xpath("//div[@class='inventory_item'][.//div[text()='" + itemName + "']]//button"));
-        item.click();
+        click(btn);
     }
 
     public void sortBy(String option) {
@@ -43,19 +40,15 @@ public class InventoryPage extends BasePage {
     }
 
     public String getCartBadgeCount() {
-        return cartBadge.getText();
+        return getText(cartBadge);
     }
 
     public boolean isCartBadgeVisible() {
-        try {
-            return cartBadge.isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
+        return isDisplayed(cartBadge);
     }
 
     public void goToCart() {
-        cartLink.click();
+        click(cartLink);
     }
 
     public String getFirstItemName() {
