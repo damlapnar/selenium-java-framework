@@ -1,10 +1,7 @@
 package com.automation.pages;
 
-import com.automation.config.DriverFactory;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
 public class LoginPage extends BasePage {
 
@@ -21,8 +18,7 @@ public class LoginPage extends BasePage {
     private WebElement errorMessageElement;
 
     public LoginPage() {
-        super(DriverFactory.getDriver());
-        PageFactory.initElements(DriverFactory.getDriver(), this);
+        super();
     }
 
     public void navigate(String url) {
@@ -30,22 +26,16 @@ public class LoginPage extends BasePage {
     }
 
     public void login(String username, String password) {
-        usernameInput.clear();
-        usernameInput.sendKeys(username);
-        passwordInput.clear();
-        passwordInput.sendKeys(password);
-        loginButton.click();
+        type(usernameInput, username);
+        type(passwordInput, password);
+        click(loginButton);
     }
 
     public boolean isErrorDisplayed() {
-        try {
-            return errorMessageElement.isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
+        return isDisplayed(errorMessageElement);
     }
 
     public String getErrorMessage() {
-        return errorMessageElement.getText();
+        return getText(errorMessageElement);
     }
 }
