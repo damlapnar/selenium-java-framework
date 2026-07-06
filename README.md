@@ -3,7 +3,8 @@
 ![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=flat-square&logo=selenium&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
 ![TestNG](https://img.shields.io/badge/TestNG-FF6C37?style=flat-square)
-![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)
+[![CI](https://github.com/damlapnar/selenium-java-framework/actions/workflows/selenium-tests.yml/badge.svg)](https://github.com/damlapnar/selenium-java-framework/actions/workflows/selenium-tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Cross-browser test automation framework built with Selenium WebDriver 4, Java 17, and TestNG. Features thread-safe driver management, data-driven testing, and parallel browser execution.
 
