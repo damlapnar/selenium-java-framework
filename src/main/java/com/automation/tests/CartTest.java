@@ -1,5 +1,6 @@
 package com.automation.tests;
 
+import com.automation.config.DriverFactory;
 import com.automation.pages.CartPage;
 import com.automation.pages.InventoryPage;
 import com.automation.pages.LoginPage;
@@ -13,7 +14,7 @@ public class CartTest extends BaseTest {
     private CartPage cartPage;
 
     @BeforeMethod
-    public void setUp() {
+    public void login() {
         LoginPage loginPage = new LoginPage();
         loginPage.navigate(BASE_URL);
         loginPage.login("standard_user", "secret_sauce");
@@ -66,7 +67,7 @@ public class CartTest extends BaseTest {
         inventoryPage.goToCart();
         cartPage = new CartPage();
         cartPage.continueShopping();
-        String url = driver.getCurrentUrl();
+        String url = DriverFactory.getDriver().getCurrentUrl();
         Assert.assertTrue(url.contains("inventory"), "Should return to inventory, got: " + url);
     }
 }
