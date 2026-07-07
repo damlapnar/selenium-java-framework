@@ -1,18 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Web Test Suite" parallel="tests" thread-count="3">
+<suite name="Selenium Test Suite" parallel="methods" thread-count="3">
 
-    <test name="Chrome Tests">
-        <parameter name="browser" value="chrome"/>
+    <listeners>
+        <listener class-name="com.automation.listeners.ScreenshotListener"/>
+    </listeners>
+
+    <test name="Login Tests">
         <classes>
             <class name="com.automation.tests.LoginTest"/>
         </classes>
     </test>
 
-    <test name="Firefox Tests">
-        <parameter name="browser" value="firefox"/>
+    <test name="Inventory Tests">
         <classes>
-            <class name="com.automation.tests.LoginTest"/>
+            <class name="com.automation.tests.InventoryTest"/>
+        </classes>
+    </test>
+
+    <test name="Cart Tests">
+        <classes>
+            <class name="com.automation.tests.CartTest"/>
+        </classes>
+    </test>
+
+    <test name="Checkout Tests">
+        <classes>
+            <class name="com.automation.tests.CheckoutTest"/>
         </classes>
     </test>
 
