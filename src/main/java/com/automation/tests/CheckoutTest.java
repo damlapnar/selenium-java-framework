@@ -1,5 +1,6 @@
 package com.automation.tests;
 
+import com.automation.config.DriverFactory;
 import com.automation.pages.CartPage;
 import com.automation.pages.CheckoutPage;
 import com.automation.pages.InventoryPage;
@@ -13,7 +14,7 @@ public class CheckoutTest extends BaseTest {
     private InventoryPage inventoryPage;
 
     @BeforeMethod
-    public void setUp() {
+    public void login() {
         LoginPage loginPage = new LoginPage();
         loginPage.navigate(BASE_URL);
         loginPage.login("standard_user", "secret_sauce");
@@ -55,7 +56,7 @@ public class CheckoutTest extends BaseTest {
         CheckoutPage checkout = new CheckoutPage();
         checkout.fillShippingInfo("Damla", "Pinar", "10001");
         checkout.clickContinue();
-        String url = driver.getCurrentUrl();
+        String url = DriverFactory.getDriver().getCurrentUrl();
         Assert.assertTrue(url.contains("checkout-step-two"), "Should be on step two: " + url);
         Assert.assertFalse(checkout.getTotalLabel().isEmpty(), "Total should be visible");
     }
@@ -64,7 +65,7 @@ public class CheckoutTest extends BaseTest {
     public void testCancelReturnsToCart() {
         CheckoutPage checkout = new CheckoutPage();
         checkout.clickCancel();
-        String url = driver.getCurrentUrl();
+        String url = DriverFactory.getDriver().getCurrentUrl();
         Assert.assertTrue(url.contains("cart"), "Should return to cart: " + url);
     }
 }
