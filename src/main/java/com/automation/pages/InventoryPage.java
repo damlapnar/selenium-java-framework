@@ -3,6 +3,7 @@ package com.automation.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
@@ -26,9 +27,12 @@ public class InventoryPage extends BasePage {
     public int getProductCount() { return inventoryItems.size(); }
 
     public void addItemToCart(String itemName) {
-        WebElement btn = driver.findElement(
-            By.xpath("//div[@class='inventory_item'][.//div[text()='" + itemName + "']]//button"));
-        click(btn);
+        // Use data-test attribute which is more stable than XPath on text
+        String key = "add-to-cart-" + itemName.toLowerCase()
+                .replace(" ", "-")
+                .replace("(", "").replace(")", "")
+                .replace(",", "").replace(".", "");
+        click(driver.findElement(By.cssSelector("[data-test='" + key + "']")));
     }
 
     public void sortBy(String option) {
@@ -39,7 +43,11 @@ public class InventoryPage extends BasePage {
 
     public boolean isCartBadgeVisible() { return isDisplayed(cartBadge); }
 
-    public void goToCart() { click(cartLink); }
+    public void goToCart() {
+        click(cartLink);
+        // SPA navigation — wait for URL to reflect cart page
+        wait.until(ExpectedConditions.urlContains("cart"));
+    }
 
     public String getFirstItemName() {
         return driver.findElement(By.cssSelector(".inventory_item_name")).getText();
@@ -51,13 +59,13 @@ public class InventoryPage extends BasePage {
 
     public List<String> getAllItemNames() {
         return driver.findElements(By.cssSelector(".inventory_item_name"))
-            .stream().map(WebElement::getText).toList();
+                .stream().map(WebElement::getText).toList();
     }
 
     public List<Double> getAllItemPrices() {
         return driver.findElements(By.cssSelector(".inventory_item_price"))
-            .stream()
-            .map(el -> Double.parseDouble(el.getText().replace("$", "")))
-            .toList();
+                .stream()
+                .map(el -> Double.parseDouble(el.getText().replace("$", "")))
+                .toList();
     }
 }
