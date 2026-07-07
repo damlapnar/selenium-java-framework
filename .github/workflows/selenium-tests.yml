@@ -5,11 +5,14 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '0 7 * * 1-5'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         browser: [chrome, firefox]
 
@@ -23,13 +26,34 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Run tests on ${{ matrix.browser }}
-        run: mvn test -Dbrowser=${{ matrix.browser }} -Dheadless=true
+      - name: Run Selenium tests
+        run: mvn test -Dbrowser=${{ matrix.browser }} -q
+        continue-on-error: false
 
-      - name: Upload test results
+      - name: Write step summary
+        if: always()
+        run: |
+          echo "## Selenium Results — ${{ matrix.browser }}" >> $GITHUB_STEP_SUMMARY
+          if [ -d target/surefire-reports ]; then
+            PASS=$(grep -r 'tests="' target/surefire-reports/*.xml 2>/dev/null |               python3 -c "import sys,re; nums=[int(m) for l in sys.stdin for m in re.findall(r'tests=.(\d+)', l)]; print(sum(nums))" || echo "?")
+            FAIL=$(grep -r 'failures="' target/surefire-reports/*.xml 2>/dev/null |               python3 -c "import sys,re; nums=[int(m) for l in sys.stdin for m in re.findall(r'failures=.(\d+)', l)]; print(sum(nums))" || echo "?")
+            echo "| ✅ Passed | $PASS |" >> $GITHUB_STEP_SUMMARY
+            echo "| ❌ Failed | $FAIL |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Surefire reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: surefire-report-${{ matrix.browser }}
+          name: surefire-${{ matrix.browser }}
           path: target/surefire-reports/
           retention-days: 30
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-${{ matrix.browser }}
+          path: target/screenshots/
+          if-no-files-found: ignore
+          retention-days: 7
