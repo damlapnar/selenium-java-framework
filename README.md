@@ -54,3 +54,38 @@ mvn test -Dheadless=true
 # Cross-browser parallel
 mvn test -DsuiteFile=src/test/resources/testng.xml
 ```
+
+---
+
+## Test Architecture
+
+### Why Selenium + TestNG?
+Selenium 4's W3C-compliant WebDriver API covers enterprise environments where Chromium-only tools are insufficient. TestNG's `@DataProvider`, parallel listeners, and `testng.xml` suite orchestration reflect real-world enterprise QA setups at scale.
+
+### Design Decisions
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| ThreadLocal driver | `DriverFactory` | Each TestNG thread gets its own driver instance; enables parallel test execution without race conditions |
+| PageFactory | `BasePage` constructor | `@FindBy` annotations keep selectors close to the page class; lazy element resolution avoids stale references |
+| Screenshot on failure | `ScreenshotListener` | Captures the exact failure state; attached automatically by TestNG listener, no per-test boilerplate |
+| Suite XML | `testng.xml` | Explicit test ordering and parallel configuration in one file; CI passes `-DsuiteXmlFile` to override |
+
+### Test Pyramid
+```
+        ┌────────────────────┐
+        │  UI Tests (Selenium)│  ← 4 test classes, cross-browser
+        ├────────────────────┤
+        │  Page Layer         │  ← 4 POMs with explicit waits
+        └────────────────────┘
+```
+
+### Adding a New Page
+1. Create `XxxPage.java` extending `BasePage` using `@FindBy` annotations
+2. Create `XxxTest.java` extending `BaseTest`
+3. Register the test class in `src/test/resources/testng.xml`
+
+### Running with Docker + Selenium Grid
+```bash
+docker compose up -d selenium-hub chrome
+docker compose run tests
+```
