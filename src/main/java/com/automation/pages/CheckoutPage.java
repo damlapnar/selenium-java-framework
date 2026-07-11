@@ -1,6 +1,6 @@
 package com.automation.pages;
 
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,18 +15,6 @@ public class CheckoutPage extends BasePage {
 
     @FindBy(css = "[data-test='postalCode']")
     private WebElement postalCodeInput;
-
-    @FindBy(css = "[data-test='continue']")
-    private WebElement continueButton;
-
-    @FindBy(css = "[data-test='finish']")
-    private WebElement finishButton;
-
-    @FindBy(css = "[data-test='cancel']")
-    private WebElement cancelButton;
-
-    @FindBy(css = "[data-test='error']")
-    private WebElement errorMessage;
 
     @FindBy(css = ".complete-header")
     private WebElement orderCompleteHeader;
@@ -43,28 +31,39 @@ public class CheckoutPage extends BasePage {
     }
 
     public void clickContinue() {
-        wait.until(ExpectedConditions.elementToBeClickable(continueButton));
-        jsClick(continueButton);
+        // Use native click on the submit input — triggers proper form submission
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='continue']")));
+        btn.click();
+        // Wait for either successful navigation OR a validation error to appear
+        wait.until(d -> {
+            String url = driver.getCurrentUrl();
+            return url.contains("checkout-step-two") ||
+                    !driver.findElements(By.cssSelector("[data-test='error']")).isEmpty();
+        });
     }
 
     public void clickFinish() {
-        wait.until(ExpectedConditions.elementToBeClickable(finishButton));
-        jsClick(finishButton);
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='finish']")));
+        jsClick(btn);
         wait.until(ExpectedConditions.urlContains("checkout-complete"));
     }
 
     public void clickCancel() {
-        wait.until(ExpectedConditions.elementToBeClickable(cancelButton));
-        jsClick(cancelButton);
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='cancel']")));
+        jsClick(btn);
     }
 
     public boolean isErrorDisplayed() {
-        return isDisplayed(errorMessage);
+        return !driver.findElements(By.cssSelector("[data-test='error']")).isEmpty();
     }
 
     public String getErrorMessage() {
-        waitForVisible(errorMessage);
-        return errorMessage.getText();
+        WebElement err = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("[data-test='error']")));
+        return err.getText();
     }
 
     public String getOrderCompleteText() {
@@ -75,9 +74,5 @@ public class CheckoutPage extends BasePage {
     public String getTotalLabel() {
         waitForVisible(totalLabel);
         return totalLabel.getText();
-    }
-
-    private void jsClick(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 }
