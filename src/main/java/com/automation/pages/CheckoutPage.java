@@ -1,9 +1,14 @@
 package com.automation.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class CheckoutPage extends BasePage {
 
@@ -31,11 +36,15 @@ public class CheckoutPage extends BasePage {
     }
 
     public void clickContinue() {
-        // Use native click on the submit input — triggers proper form submission
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.cssSelector("[data-test='continue']")));
-        btn.click();
-        // Wait for either successful navigation OR a validation error to appear
+        // Try Actions click (most reliable in headless), fall back to JS click
+        try {
+            new Actions(driver).moveToElement(btn).click().perform();
+        } catch (Exception e) {
+            jsClick(btn);
+        }
+        // Wait for either navigation to step-two OR a validation error
         wait.until(d -> {
             String url = driver.getCurrentUrl();
             return url.contains("checkout-step-two") ||
