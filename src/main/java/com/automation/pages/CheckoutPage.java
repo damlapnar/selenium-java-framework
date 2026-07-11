@@ -1,14 +1,10 @@
 package com.automation.pages;
 
+import com.automation.config.DriverFactory;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 public class CheckoutPage extends BasePage {
 
@@ -29,6 +25,11 @@ public class CheckoutPage extends BasePage {
 
     public CheckoutPage() { super(); }
 
+    public boolean isFormDisplayed() {
+        return !driver.findElements(By.cssSelector("[data-test='firstName']")).isEmpty()
+                && !driver.findElements(By.cssSelector("[data-test='continue']")).isEmpty();
+    }
+
     public void fillShippingInfo(String firstName, String lastName, String postalCode) {
         type(firstNameInput, firstName);
         type(lastNameInput, lastName);
@@ -38,18 +39,7 @@ public class CheckoutPage extends BasePage {
     public void clickContinue() {
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.cssSelector("[data-test='continue']")));
-        // Try Actions click (most reliable in headless), fall back to JS click
-        try {
-            new Actions(driver).moveToElement(btn).click().perform();
-        } catch (Exception e) {
-            jsClick(btn);
-        }
-        // Wait for either navigation to step-two OR a validation error
-        wait.until(d -> {
-            String url = driver.getCurrentUrl();
-            return url.contains("checkout-step-two") ||
-                    !driver.findElements(By.cssSelector("[data-test='error']")).isEmpty();
-        });
+        jsClick(btn);
     }
 
     public void clickFinish() {
