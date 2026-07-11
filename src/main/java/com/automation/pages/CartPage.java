@@ -9,9 +9,6 @@ import java.util.List;
 
 public class CartPage extends BasePage {
 
-    @FindBy(css = ".cart_item")
-    private List<WebElement> cartItems;
-
     @FindBy(css = "[data-test='checkout']")
     private WebElement checkoutButton;
 
@@ -21,15 +18,12 @@ public class CartPage extends BasePage {
     public CartPage() { super(); }
 
     public int getItemCount() {
-        // Re-query to get fresh count after any DOM updates
         return driver.findElements(By.cssSelector(".cart_item")).size();
     }
 
     public boolean containsItem(String itemName) {
-        // Find any .inventory_item_name whose text equals the item name
         return driver.findElements(By.cssSelector(".inventory_item_name"))
-                .stream()
-                .anyMatch(el -> itemName.equals(el.getText()));
+                .stream().anyMatch(el -> itemName.equals(el.getText()));
     }
 
     public void removeItem(String itemName) {
@@ -37,7 +31,7 @@ public class CartPage extends BasePage {
                 .replace(" ", "-")
                 .replace("(", "").replace(")", "")
                 .replace(",", "").replace(".", "");
-        click(driver.findElement(By.cssSelector("[data-test='" + key + "']")));
+        driver.findElement(By.cssSelector("[data-test='" + key + "']")).click();
     }
 
     public void proceedToCheckout() {
@@ -51,7 +45,6 @@ public class CartPage extends BasePage {
     }
 
     public String getItemPrice(String itemName) {
-        // Find the cart_item that contains the named product, then get its price
         for (WebElement item : driver.findElements(By.cssSelector(".cart_item"))) {
             List<WebElement> names = item.findElements(By.cssSelector(".inventory_item_name"));
             if (!names.isEmpty() && itemName.equals(names.get(0).getText())) {
