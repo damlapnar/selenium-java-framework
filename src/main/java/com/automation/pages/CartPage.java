@@ -1,7 +1,6 @@
 package com.automation.pages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -35,9 +34,8 @@ public class CartPage extends BasePage {
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.cssSelector("[data-test='" + key + "']")));
         jsClick(btn);
-        // Wait for item count to decrease
-        int sizeBefore = getItemCount() + 1;
-        wait.until(d -> driver.findElements(By.cssSelector(".cart_item")).size() < sizeBefore);
+        int before = getItemCount() + 1;
+        wait.until(d -> driver.findElements(By.cssSelector(".cart_item")).size() < before);
     }
 
     public void proceedToCheckout() {
@@ -60,9 +58,5 @@ public class CartPage extends BasePage {
             }
         }
         throw new RuntimeException("Item not found in cart: " + itemName);
-    }
-
-    private void jsClick(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 }
