@@ -1,7 +1,9 @@
 package com.automation.pages;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CheckoutPage extends BasePage {
 
@@ -40,15 +42,42 @@ public class CheckoutPage extends BasePage {
         type(postalCodeInput, postalCode);
     }
 
-    public void clickContinue() { click(continueButton); }
-    public void clickFinish()   { click(finishButton); }
-    public void clickCancel()   { click(cancelButton); }
+    public void clickContinue() {
+        wait.until(ExpectedConditions.elementToBeClickable(continueButton));
+        jsClick(continueButton);
+    }
 
-    public String getErrorMessage() { return getText(errorMessage); }
+    public void clickFinish() {
+        wait.until(ExpectedConditions.elementToBeClickable(finishButton));
+        jsClick(finishButton);
+        wait.until(ExpectedConditions.urlContains("checkout-complete"));
+    }
 
-    public boolean isErrorDisplayed() { return isDisplayed(errorMessage); }
+    public void clickCancel() {
+        wait.until(ExpectedConditions.elementToBeClickable(cancelButton));
+        jsClick(cancelButton);
+    }
 
-    public String getOrderCompleteText() { return getText(orderCompleteHeader); }
+    public boolean isErrorDisplayed() {
+        return isDisplayed(errorMessage);
+    }
 
-    public String getTotalLabel() { return getText(totalLabel); }
+    public String getErrorMessage() {
+        waitForVisible(errorMessage);
+        return errorMessage.getText();
+    }
+
+    public String getOrderCompleteText() {
+        waitForVisible(orderCompleteHeader);
+        return orderCompleteHeader.getText();
+    }
+
+    public String getTotalLabel() {
+        waitForVisible(totalLabel);
+        return totalLabel.getText();
+    }
+
+    private void jsClick(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
 }
