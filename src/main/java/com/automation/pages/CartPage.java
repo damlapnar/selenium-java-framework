@@ -1,6 +1,7 @@
 package com.automation.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -31,16 +32,23 @@ public class CartPage extends BasePage {
                 .replace(" ", "-")
                 .replace("(", "").replace(")", "")
                 .replace(",", "").replace(".", "");
-        driver.findElement(By.cssSelector("[data-test='" + key + "']")).click();
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='" + key + "']")));
+        jsClick(btn);
+        // Wait for item count to decrease
+        int sizeBefore = getItemCount() + 1;
+        wait.until(d -> driver.findElements(By.cssSelector(".cart_item")).size() < sizeBefore);
     }
 
     public void proceedToCheckout() {
-        click(checkoutButton);
+        wait.until(ExpectedConditions.elementToBeClickable(checkoutButton));
+        jsClick(checkoutButton);
         wait.until(ExpectedConditions.urlContains("checkout-step-one"));
     }
 
     public void continueShopping() {
-        click(continueShoppingButton);
+        wait.until(ExpectedConditions.elementToBeClickable(continueShoppingButton));
+        jsClick(continueShoppingButton);
         wait.until(ExpectedConditions.urlContains("inventory"));
     }
 
@@ -52,5 +60,9 @@ public class CartPage extends BasePage {
             }
         }
         throw new RuntimeException("Item not found in cart: " + itemName);
+    }
+
+    private void jsClick(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 }
