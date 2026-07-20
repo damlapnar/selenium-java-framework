@@ -16,6 +16,7 @@ Cross-browser test automation framework built with Selenium WebDriver 4, Java 17
 - **Layered Base Tests** — `BaseTest` → `AuthenticatedBaseTest` → `CartBaseTest`, so each test class only sets up the state it actually needs
 - **Centralized Test Data** — `TestData` holds all saucedemo demo accounts, product names, and shipping fields
 - **Screenshot on Failure** — `ScreenshotListener` captures a PNG for every failed test, and survives a browser session that's already gone
+- **Static Analysis** — curated Checkstyle ruleset (`config/checkstyle.xml`), run in the Maven `verify` phase
 - **CI/CD** — GitHub Actions workflow running the full suite headless
 
 ## Project Structure
