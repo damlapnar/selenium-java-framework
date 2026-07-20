@@ -50,6 +50,34 @@
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <!--
+                      Custom config (config/checkstyle.xml), not the bundled
+                      google_checks.xml/sun_checks.xml: Google's enforces
+                      2-space indentation (this codebase uses 4), and Sun's
+                      demands Javadoc on every method/field and `final` on
+                      every parameter — ceremony, not real bugs, against
+                      this codebase.
+                    -->
+                    <configLocation>config/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failOnViolation>true</failOnViolation>
+                    <violationSeverity>warning</violationSeverity>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

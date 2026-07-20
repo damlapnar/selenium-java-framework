@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  A deliberately small, curated ruleset rather than Sun's or Google's
+  bundled defaults: Google's enforces 2-space indentation (this codebase
+  uses 4), and Sun's demands Javadoc on every method/field, `final` on
+  every parameter, and flags things like magic numbers in test data —
+  ceremony, not real bugs, when tried against this codebase. This keeps
+  only checks that catch actual mistakes.
+-->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+
+    <module name="TreeWalker">
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+        <module name="AvoidStarImport"/>
+        <module name="EqualsHashCode"/>
+        <module name="EmptyCatchBlock"/>
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+        </module>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="OneStatementPerLine"/>
+    </module>
+
+    <module name="LineLength">
+        <property name="max" value="150"/>
+    </module>
+    <module name="FileTabCharacter"/>
+</module>
