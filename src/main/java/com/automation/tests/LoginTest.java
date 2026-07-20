@@ -1,6 +1,7 @@
 package com.automation.tests;
 
 import com.automation.config.DriverFactory;
+import com.automation.data.TestData;
 import com.automation.pages.LoginPage;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -19,7 +20,7 @@ public class LoginTest extends BaseTest {
 
     @Test(description = "Valid login navigates to inventory page")
     public void testValidLogin() {
-        loginPage.login("standard_user", "secret_sauce");
+        loginPage.login(TestData.Users.STANDARD_USERNAME, TestData.Users.PASSWORD);
         Assert.assertTrue(
             DriverFactory.getDriver().getCurrentUrl().contains("inventory"),
             "Should navigate to inventory after login"
@@ -38,7 +39,7 @@ public class LoginTest extends BaseTest {
 
     @Test(description = "Locked out user shows appropriate error")
     public void testLockedOutUser() {
-        loginPage.login("locked_out_user", "secret_sauce");
+        loginPage.login(TestData.Users.LOCKED_OUT_USERNAME, TestData.Users.PASSWORD);
         Assert.assertTrue(loginPage.getErrorMessage().contains("locked out"));
     }
 
