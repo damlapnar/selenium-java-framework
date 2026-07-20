@@ -6,7 +6,7 @@
 [![CI](https://github.com/damlapnar/selenium-java-framework/actions/workflows/selenium-tests.yml/badge.svg)](https://github.com/damlapnar/selenium-java-framework/actions/workflows/selenium-tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Cross-browser test automation framework built with Selenium WebDriver 4, Java 17, and TestNG against [saucedemo.com](https://www.saucedemo.com). Features thread-safe driver management, a Selenium Grid-ready `RemoteWebDriver` path, layered base tests for DRY setup, and full login/inventory/cart/checkout coverage.
+Cross-browser test automation framework built with Selenium WebDriver 4, Java 17, and TestNG against [saucedemo.com](https://www.saucedemo.com). Features thread-safe driver management, a Selenium Grid-ready `RemoteWebDriver` path, layered base tests for DRY setup, and full login/inventory/cart/checkout/product-detail/navigation coverage.
 
 ## Features
 
@@ -33,8 +33,8 @@ selenium-java-framework/
 │   │   ├── BasePage.java           # Common WebElement interactions, jsClick()
 │   │   ├── LoginPage.java
 │   │   ├── InventoryPage.java
-│   │   ├── ProductPage.java        # Single-product detail view (available, not yet exercised by a test class)
-│   │   ├── NavigationPage.java     # Burger menu: logout / reset app state (available, not yet exercised by a test class)
+│   │   ├── ProductPage.java        # Single-product detail view
+│   │   ├── NavigationPage.java     # Burger menu: logout / reset app state
 │   │   ├── CartPage.java
 │   │   └── CheckoutPage.java
 │   └── tests/
@@ -44,12 +44,12 @@ selenium-java-framework/
 │       ├── LoginTest.java
 │       ├── InventoryTest.java
 │       ├── CartTest.java
-│       └── CheckoutTest.java
+│       ├── CheckoutTest.java
+│       ├── ProductTest.java
+│       └── NavigationTest.java
 └── src/test/resources/
-    └── testng.xml                  # 4 suites: Login, Inventory, Cart, Checkout
+    └── testng.xml                  # 6 suites: Login, Inventory, Cart, Checkout, Product, Navigation
 ```
-
-`NavigationPage` and `ProductPage` are complete page objects without dedicated test classes yet — a natural next step for anyone extending this suite (logout/reset-state flows, single-product detail assertions).
 
 ## Prerequisites
 
@@ -90,7 +90,7 @@ Selenium 4's W3C-compliant WebDriver API covers enterprise environments where Ch
 ### Test Pyramid
 ```
         ┌────────────────────┐
-        │  UI Tests (Selenium)│  ← 4 test classes, 20 tests, cross-browser
+        │  UI Tests (Selenium)│  ← 6 test classes, 26 tests, cross-browser
         ├────────────────────┤
         │  Page Layer         │  ← 6 POMs with explicit waits
         └────────────────────┘

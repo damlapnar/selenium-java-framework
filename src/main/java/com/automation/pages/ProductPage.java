@@ -2,6 +2,7 @@ package com.automation.pages;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class ProductPage extends BasePage {
 
@@ -23,16 +24,20 @@ public class ProductPage extends BasePage {
     @FindBy(css = "[data-test='back-to-products']")
     private WebElement backButton;
 
+    // Same headless-click reliability issue as every other page object here —
+    // native click() doesn't consistently register, jsClick() does.
     public void addToCart() {
-        click(addToCartButton);
+        jsClick(addToCartButton);
+        waitForVisible(removeFromCartButton);
     }
 
     public void removeFromCart() {
-        click(removeFromCartButton);
+        jsClick(removeFromCartButton);
     }
 
     public void goBack() {
-        click(backButton);
+        jsClick(backButton);
+        wait.until(ExpectedConditions.urlContains("inventory.html"));
     }
 
     public boolean isProductNameDisplayed() {

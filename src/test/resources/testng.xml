@@ -30,4 +30,16 @@
         </classes>
     </test>
 
+    <test name="Product Tests">
+        <classes>
+            <class name="com.automation.tests.ProductTest"/>
+        </classes>
+    </test>
+
+    <test name="Navigation Tests">
+        <classes>
+            <class name="com.automation.tests.NavigationTest"/>
+        </classes>
+    </test>
+
 </suite>
