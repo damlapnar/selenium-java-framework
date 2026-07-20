@@ -1,6 +1,7 @@
 package com.automation.pages;
 
 import com.automation.config.DriverFactory;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -35,6 +36,8 @@ public abstract class BasePage {
 
     protected void type(WebElement element, String text) {
         waitForVisible(element);
+        // Click to focus first — required for React-controlled inputs
+        element.click();
         element.clear();
         element.sendKeys(text);
     }
@@ -50,5 +53,9 @@ public abstract class BasePage {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    protected void jsClick(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 }

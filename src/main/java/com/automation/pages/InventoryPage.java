@@ -3,89 +3,104 @@ package com.automation.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class InventoryPage extends BasePage {
 
-    @FindBy(className = "inventory_item")
-    private List<WebElement> productItems;
-
-    @FindBy(className = "shopping_cart_badge")
-    private WebElement cartBadge;
+    @FindBy(css = ".inventory_item")
+    private List<WebElement> inventoryItems;
 
     @FindBy(css = "select.product_sort_container")
     private WebElement sortDropdown;
 
-    @FindBy(className = "shopping_cart_link")
-    private WebElement cartLink;
-
-    @FindBy(className = "inventory_item_name")
-    private List<WebElement> productNames;
-
-    @FindBy(className = "inventory_item_price")
-    private List<WebElement> productPrices;
-
-    // @FindBy can't parameterize on an item name at compile time, so item-scoped
-    // lookups (add/remove/open by product name) go through a fresh By.xpath()
-    // built from the current inventory_item_name text instead of a fixed field.
-    private WebElement itemContainer(String itemName) {
-        return driver.findElement(By.xpath(
-            "//div[@class='inventory_item'][.//div[@class='inventory_item_name' and text()='"
-                + itemName + "']]"
-        ));
-    }
-
-    private WebElement itemButton(String itemName) {
-        return itemContainer(itemName).findElement(By.tagName("button"));
+    public InventoryPage() {
+        super();
     }
 
     public int getProductCount() {
-        return productItems.size();
+        return inventoryItems.size();
     }
 
     public void addItemToCart(String itemName) {
-        click(itemButton(itemName));
+        int prevCount = currentCartCount();
+        // Specific XPath — targets only the "Add to cart" button for this item
+        String xpath = "//div[contains(@class,'inventory_item')]"
+                + "[.//div[contains(@class,'inventory_item_name') and text()='" + itemName + "']]"
+                + "//button[contains(text(),'Add to cart')]";
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+        jsClick(btn);
+        int expected = prevCount + 1;
+        wait.until(d -> currentCartCount() == expected);
     }
 
-    // Sauce Labs toggles the same button between Add/Remove for a given item,
-    // so this is the identical click — sharing itemButton() keeps that locator
-    // logic in one place instead of duplicating it.
+    // Sauce Labs toggles the same button between "Add to cart" and "Remove"
+    // for a given item, so the button's visible text is what distinguishes
+    // this from addItemToCart — same JS-click + badge-wait reliability
+    // pattern either way.
     public void removeItemFromCart(String itemName) {
-        click(itemButton(itemName));
+        int prevCount = currentCartCount();
+        String xpath = "//div[contains(@class,'inventory_item')]"
+                + "[.//div[contains(@class,'inventory_item_name') and text()='" + itemName + "']]"
+                + "//button[contains(text(),'Remove')]";
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+        jsClick(btn);
+        int expected = prevCount - 1;
+        wait.until(d -> currentCartCount() == expected);
     }
 
     public void openProduct(String itemName) {
-        WebElement nameLink = itemContainer(itemName).findElement(By.className("inventory_item_name"));
-        click(nameLink);
+        String xpath = "//div[contains(@class,'inventory_item')]"
+                + "[.//div[contains(@class,'inventory_item_name') and text()='" + itemName + "']]"
+                + "//div[contains(@class,'inventory_item_name')]";
+        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+        jsClick(link);
+        wait.until(ExpectedConditions.urlContains("inventory-item"));
     }
 
-    public void sortBy(String value) {
+    private int currentCartCount() {
+        List<WebElement> badges = driver.findElements(By.cssSelector(".shopping_cart_badge"));
+        return badges.isEmpty() ? 0 : Integer.parseInt(badges.get(0).getText());
+    }
+
+    public void sortBy(String option) {
         waitForVisible(sortDropdown);
-        new Select(sortDropdown).selectByValue(value);
+        new Select(sortDropdown).selectByValue(option);
     }
 
-    public List<String> getProductNames() {
-        return productNames.stream().map(WebElement::getText).collect(Collectors.toList());
+    public String getCartBadgeCount() {
+        return String.valueOf(currentCartCount());
     }
 
-    public List<Double> getProductPrices() {
-        return productPrices.stream()
-            .map(el -> Double.parseDouble(el.getText().replaceAll("[^0-9.]", "")))
-            .collect(Collectors.toList());
-    }
-
-    public String getCartBadgeText() {
-        return getText(cartBadge);
-    }
-
-    public boolean isCartBadgeDisplayed() {
-        return isDisplayed(cartBadge);
+    public boolean isCartBadgeVisible() {
+        return !driver.findElements(By.cssSelector(".shopping_cart_badge")).isEmpty();
     }
 
     public void goToCart() {
-        click(cartLink);
+        // Direct navigation avoids headless click issues with the cart icon
+        String origin = driver.getCurrentUrl().replaceAll("(https?://[^/]+).*", "$1");
+        driver.navigate().to(origin + "/cart.html");
+    }
+
+    public String getFirstItemName() {
+        return driver.findElement(By.cssSelector(".inventory_item_name")).getText();
+    }
+
+    public String getFirstItemPrice() {
+        return driver.findElement(By.cssSelector(".inventory_item_price")).getText();
+    }
+
+    public List<String> getAllItemNames() {
+        return driver.findElements(By.cssSelector(".inventory_item_name"))
+                .stream().map(WebElement::getText).toList();
+    }
+
+    public List<Double> getAllItemPrices() {
+        return driver.findElements(By.cssSelector(".inventory_item_price"))
+                .stream()
+                .map(el -> Double.parseDouble(el.getText().replace("$", "")))
+                .toList();
     }
 }

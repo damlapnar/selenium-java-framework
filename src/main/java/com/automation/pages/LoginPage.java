@@ -15,10 +15,14 @@ public class LoginPage extends BasePage {
     private WebElement loginButton;
 
     @FindBy(css = "[data-test='error']")
-    private WebElement errorMessage;
+    private WebElement errorMessageElement;
 
-    public void navigate(String baseUrl) {
-        driver.get(baseUrl);
+    public LoginPage() {
+        super();
+    }
+
+    public void navigate(String url) {
+        driver.get(url);
     }
 
     public void login(String username, String password) {
@@ -27,11 +31,11 @@ public class LoginPage extends BasePage {
         click(loginButton);
     }
 
-    public String getErrorMessage() {
-        return getText(errorMessage);
+    public boolean isErrorDisplayed() {
+        return isDisplayed(errorMessageElement);
     }
 
-    public boolean isErrorDisplayed() {
-        return isDisplayed(errorMessage);
+    public String getErrorMessage() {
+        return getText(errorMessageElement);
     }
 }

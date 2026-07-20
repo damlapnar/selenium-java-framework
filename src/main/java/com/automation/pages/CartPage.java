@@ -3,13 +3,11 @@ package com.automation.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
 public class CartPage extends BasePage {
-
-    @FindBy(className = "cart_item")
-    private List<WebElement> cartItems;
 
     @FindBy(css = "[data-test='checkout']")
     private WebElement checkoutButton;
@@ -17,30 +15,48 @@ public class CartPage extends BasePage {
     @FindBy(css = "[data-test='continue-shopping']")
     private WebElement continueShoppingButton;
 
+    public CartPage() { super(); }
+
     public int getItemCount() {
-        return cartItems.size();
+        return driver.findElements(By.cssSelector(".cart_item")).size();
     }
 
-    public boolean isItemInCart(String itemName) {
-        return driver.findElements(By.xpath(
-            "//div[@class='cart_item'][.//div[@class='inventory_item_name' and text()='"
-                + itemName + "']]"
-        )).size() > 0;
+    public boolean containsItem(String itemName) {
+        return driver.findElements(By.cssSelector(".inventory_item_name"))
+                .stream().anyMatch(el -> itemName.equals(el.getText()));
     }
 
     public void removeItem(String itemName) {
-        WebElement button = driver.findElement(By.xpath(
-            "//div[@class='cart_item'][.//div[@class='inventory_item_name' and text()='"
-                + itemName + "']]//button"
-        ));
-        click(button);
+        String key = "remove-" + itemName.toLowerCase()
+                .replace(" ", "-")
+                .replace("(", "").replace(")", "")
+                .replace(",", "").replace(".", "");
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='" + key + "']")));
+        jsClick(btn);
+        int before = getItemCount() + 1;
+        wait.until(d -> driver.findElements(By.cssSelector(".cart_item")).size() < before);
     }
 
     public void proceedToCheckout() {
-        click(checkoutButton);
+        wait.until(ExpectedConditions.elementToBeClickable(checkoutButton));
+        jsClick(checkoutButton);
+        wait.until(ExpectedConditions.urlContains("checkout-step-one"));
     }
 
     public void continueShopping() {
-        click(continueShoppingButton);
+        wait.until(ExpectedConditions.elementToBeClickable(continueShoppingButton));
+        jsClick(continueShoppingButton);
+        wait.until(ExpectedConditions.urlContains("inventory"));
+    }
+
+    public String getItemPrice(String itemName) {
+        for (WebElement item : driver.findElements(By.cssSelector(".cart_item"))) {
+            List<WebElement> names = item.findElements(By.cssSelector(".inventory_item_name"));
+            if (!names.isEmpty() && itemName.equals(names.get(0).getText())) {
+                return item.findElement(By.cssSelector(".inventory_item_price")).getText();
+            }
+        }
+        throw new RuntimeException("Item not found in cart: " + itemName);
     }
 }

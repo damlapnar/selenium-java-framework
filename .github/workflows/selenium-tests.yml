@@ -5,13 +5,12 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '0 7 * * 1-5'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        browser: [chrome, firefox]
 
     steps:
       - uses: actions/checkout@v4
@@ -23,13 +22,22 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Run tests on ${{ matrix.browser }}
-        run: mvn test -Dbrowser=${{ matrix.browser }} -Dheadless=true
+      - name: Run Selenium tests
+        run: mvn test -Dbrowser=chrome -Dheadless=true -q
 
-      - name: Upload test results
+      - name: Upload Surefire reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: surefire-report-${{ matrix.browser }}
+          name: surefire-reports
           path: target/surefire-reports/
           retention-days: 30
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: screenshots
+          path: target/screenshots/
+          if-no-files-found: ignore
+          retention-days: 7

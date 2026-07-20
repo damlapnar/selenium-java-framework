@@ -1,7 +1,9 @@
 package com.automation.pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CheckoutPage extends BasePage {
 
@@ -14,20 +16,8 @@ public class CheckoutPage extends BasePage {
     @FindBy(css = "[data-test='postalCode']")
     private WebElement postalCodeInput;
 
-    @FindBy(css = "[data-test='continue']")
-    private WebElement continueButton;
-
-    @FindBy(css = "[data-test='finish']")
-    private WebElement finishButton;
-
-    @FindBy(css = "[data-test='cancel']")
-    private WebElement cancelButton;
-
-    @FindBy(className = "complete-header")
-    private WebElement orderConfirmation;
-
-    @FindBy(css = "[data-test='error']")
-    private WebElement errorMessage;
+    @FindBy(css = ".complete-header")
+    private WebElement orderCompleteHeader;
 
     @FindBy(className = "summary_subtotal_label")
     private WebElement subtotalLabel;
@@ -35,8 +25,17 @@ public class CheckoutPage extends BasePage {
     @FindBy(className = "summary_tax_label")
     private WebElement taxLabel;
 
-    @FindBy(className = "summary_total_label")
+    @FindBy(css = ".summary_total_label")
     private WebElement totalLabel;
+
+    public CheckoutPage() {
+        super();
+    }
+
+    public boolean isFormDisplayed() {
+        return !driver.findElements(By.cssSelector("[data-test='firstName']")).isEmpty()
+                && !driver.findElements(By.cssSelector("[data-test='continue']")).isEmpty();
+    }
 
     public void fillShippingInfo(String firstName, String lastName, String postalCode) {
         type(firstNameInput, firstName);
@@ -44,29 +43,43 @@ public class CheckoutPage extends BasePage {
         type(postalCodeInput, postalCode);
     }
 
-    // "continue" is a reserved word in Java, hence the longer method name.
-    public void continueToOverview() {
-        click(continueButton);
+    public void clickContinue() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='continue']")));
+        jsClick(btn);
     }
 
-    public void finish() {
-        click(finishButton);
+    public void clickFinish() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='finish']")));
+        jsClick(btn);
+        wait.until(ExpectedConditions.urlContains("checkout-complete"));
     }
 
-    public void cancel() {
-        click(cancelButton);
-    }
-
-    public String getOrderConfirmationText() {
-        return getText(orderConfirmation);
-    }
-
-    public String getErrorMessage() {
-        return getText(errorMessage);
+    public void clickCancel() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test='cancel']")));
+        jsClick(btn);
     }
 
     public boolean isErrorDisplayed() {
-        return isDisplayed(errorMessage);
+        return !driver.findElements(By.cssSelector("[data-test='error']")).isEmpty();
+    }
+
+    public String getErrorMessage() {
+        WebElement err = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("[data-test='error']")));
+        return err.getText();
+    }
+
+    public String getOrderCompleteText() {
+        waitForVisible(orderCompleteHeader);
+        return orderCompleteHeader.getText();
+    }
+
+    public String getTotalLabel() {
+        waitForVisible(totalLabel);
+        return totalLabel.getText();
     }
 
     private double parseCurrency(WebElement element) {
