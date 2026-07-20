@@ -1,71 +1,70 @@
 package com.automation.tests;
 
 import com.automation.config.DriverFactory;
+import com.automation.data.TestData;
 import com.automation.pages.CartPage;
 import com.automation.pages.InventoryPage;
-import com.automation.pages.LoginPage;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CartTest extends BaseTest {
+// Extends AuthenticatedBaseTest rather than CartBaseTest: most tests here
+// need two different items in the cart (or none yet), not the one
+// pre-seeded Backpack CartBaseTest provides, so each test seeds its own.
+public class CartTest extends AuthenticatedBaseTest {
 
     private InventoryPage inventoryPage;
-    private CartPage cartPage;
 
     @BeforeMethod
-    public void login() {
-        LoginPage loginPage = new LoginPage();
-        loginPage.navigate(BASE_URL);
-        loginPage.login("standard_user", "secret_sauce");
+    public void initPage() {
         inventoryPage = new InventoryPage();
     }
 
     @Test(description = "Added item appears in cart")
     public void testItemAppearsInCart() {
-        inventoryPage.addItemToCart("Sauce Labs Backpack");
+        inventoryPage.addItemToCart(TestData.Products.BACKPACK);
         inventoryPage.goToCart();
-        cartPage = new CartPage();
-        Assert.assertTrue(cartPage.containsItem("Sauce Labs Backpack"));
+        CartPage cartPage = new CartPage();
+        Assert.assertTrue(cartPage.containsItem(TestData.Products.BACKPACK));
         Assert.assertEquals(cartPage.getItemCount(), 1);
     }
 
     @Test(description = "Multiple items all appear in cart")
     public void testMultipleItemsInCart() {
-        inventoryPage.addItemToCart("Sauce Labs Backpack");
-        inventoryPage.addItemToCart("Sauce Labs Bike Light");
+        inventoryPage.addItemToCart(TestData.Products.BACKPACK);
+        inventoryPage.addItemToCart(TestData.Products.BIKE_LIGHT);
         inventoryPage.goToCart();
-        cartPage = new CartPage();
+        CartPage cartPage = new CartPage();
         Assert.assertEquals(cartPage.getItemCount(), 2);
-        Assert.assertTrue(cartPage.containsItem("Sauce Labs Backpack"));
-        Assert.assertTrue(cartPage.containsItem("Sauce Labs Bike Light"));
+        Assert.assertTrue(cartPage.containsItem(TestData.Products.BACKPACK));
+        Assert.assertTrue(cartPage.containsItem(TestData.Products.BIKE_LIGHT));
     }
 
     @Test(description = "Removing item decrements cart count")
     public void testRemoveItemFromCart() {
-        inventoryPage.addItemToCart("Sauce Labs Backpack");
-        inventoryPage.addItemToCart("Sauce Labs Bike Light");
+        inventoryPage.addItemToCart(TestData.Products.BACKPACK);
+        inventoryPage.addItemToCart(TestData.Products.BIKE_LIGHT);
         inventoryPage.goToCart();
-        cartPage = new CartPage();
-        cartPage.removeItem("Sauce Labs Backpack");
+        CartPage cartPage = new CartPage();
+        cartPage.removeItem(TestData.Products.BACKPACK);
         Assert.assertEquals(cartPage.getItemCount(), 1);
-        Assert.assertFalse(cartPage.containsItem("Sauce Labs Backpack"));
+        Assert.assertFalse(cartPage.containsItem(TestData.Products.BACKPACK));
     }
 
     @Test(description = "Cart item shows its price")
     public void testCartItemShowsPrice() {
-        inventoryPage.addItemToCart("Sauce Labs Backpack");
+        inventoryPage.addItemToCart(TestData.Products.BACKPACK);
         inventoryPage.goToCart();
-        cartPage = new CartPage();
-        String price = cartPage.getItemPrice("Sauce Labs Backpack");
+        CartPage cartPage = new CartPage();
+        String price = cartPage.getItemPrice(TestData.Products.BACKPACK);
         Assert.assertTrue(price.startsWith("$"), "Price should start with $: " + price);
     }
 
     @Test(description = "Continue shopping returns to inventory")
     public void testContinueShopping() {
-        inventoryPage.addItemToCart("Sauce Labs Backpack");
+        inventoryPage.addItemToCart(TestData.Products.BACKPACK);
         inventoryPage.goToCart();
-        cartPage = new CartPage();
+        CartPage cartPage = new CartPage();
         cartPage.continueShopping();
         String url = DriverFactory.getDriver().getCurrentUrl();
         Assert.assertTrue(url.contains("inventory"), "Should return to inventory, got: " + url);

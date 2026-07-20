@@ -1,27 +1,21 @@
 package com.automation.tests;
 
 import com.automation.config.DriverFactory;
-import com.automation.pages.CartPage;
+import com.automation.data.TestData;
 import com.automation.pages.CheckoutPage;
-import com.automation.pages.InventoryPage;
-import com.automation.pages.LoginPage;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CheckoutTest extends BaseTest {
-
-    private InventoryPage inventoryPage;
+// CartBaseTest already seeds a Backpack and lands on the cart page; this
+// only needs to take the one extra step into checkout. TestNG runs
+// superclass @BeforeMethod methods first, so seedCart() always completes
+// before proceedToCheckout() here.
+public class CheckoutTest extends CartBaseTest {
 
     @BeforeMethod
-    public void login() {
-        LoginPage loginPage = new LoginPage();
-        loginPage.navigate(BASE_URL);
-        loginPage.login("standard_user", "secret_sauce");
-        inventoryPage = new InventoryPage();
-        inventoryPage.addItemToCart("Sauce Labs Backpack");
-        inventoryPage.goToCart();
-        new CartPage().proceedToCheckout();
+    public void proceedToCheckout() {
+        cartPage.proceedToCheckout();
     }
 
     @Test(description = "Checkout form is displayed on step one")
@@ -33,7 +27,7 @@ public class CheckoutTest extends BaseTest {
     @Test(description = "Missing first name shows validation error")
     public void testMissingFirstNameError() {
         CheckoutPage checkout = new CheckoutPage();
-        checkout.fillShippingInfo("", "Pinar", "10001");
+        checkout.fillShippingInfo("", TestData.Shipping.LAST_NAME, TestData.Shipping.POSTAL_CODE);
         checkout.clickContinue();
         Assert.assertTrue(checkout.isErrorDisplayed(), "Error should appear for missing first name");
         Assert.assertTrue(checkout.getErrorMessage().contains("First Name is required"));

@@ -9,11 +9,10 @@
     <version>1.0.0</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <selenium.version>4.21.0</selenium.version>
         <testng.version>7.10.2</testng.version>
-        <extentreports.version>5.1.1</extentreports.version>
     </properties>
 
     <dependencies>
@@ -26,11 +25,6 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testng.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.aventstack</groupId>
-            <artifactId>extentreports</artifactId>
-            <version>${extentreports.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
