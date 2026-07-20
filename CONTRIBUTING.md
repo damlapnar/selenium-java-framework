@@ -24,9 +24,11 @@ mvn test -Dheadless=true
 
 ## Guidelines
 
-- Follow the Page Object Model pattern for all new page interactions
-- Keep step definitions thin — business logic belongs in page objects
-- Add `@smoke` tag to critical path tests
+- Follow the Page Object Model pattern for all new page interactions: locators and clicks belong in a `pages/` class, assertions belong in the test
+- Use `jsClick()` (from `BasePage`) instead of a native `WebElement.click()` for saucedemo's React-controlled buttons — native clicks don't reliably register in headless Chrome
+- Extend `AuthenticatedBaseTest` or `CartBaseTest` instead of duplicating login/cart-seeding `@BeforeMethod`s
+- Put shared users, product names, and shipping data in `TestData` rather than inline string literals
+- Register every new test class in `src/test/resources/testng.xml`
 - Ensure tests are independent and idempotent
 
 ## Pull Request Process
