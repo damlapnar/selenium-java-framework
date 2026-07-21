@@ -10,7 +10,7 @@ Thank you for your interest in contributing!
 ## Getting Started
 
 ```bash
-git clone https://github.com/damlapinar/selenium-java-framework.git
+git clone https://github.com/damlapnar/selenium-java-framework.git
 cd selenium-java-framework
 mvn test -Dheadless=true
 ```
